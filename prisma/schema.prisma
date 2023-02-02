@@ -1,0 +1,364 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+model NewsLetter {
+  id String @id @default(uuid())
+
+  email String @unique
+
+  createdAt DateTime @default(now())
+}
+
+model Reviews {
+  id String @id @default(uuid())
+
+  user    Users  @relation(name: "userReview", fields: [user_id], references: [id])
+  user_id String
+
+  review String
+  rating Int
+
+  product    Products @relation(name: "productReview", fields: [product_id], references: [id])
+  product_id String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SliderImages {
+  id     String    @id @default(uuid())
+  images String[]
+  type   ImageType @unique
+
+  createdAt DateTime @default(now())
+}
+
+model Footer {
+  id       String  @id @default(uuid())
+  title    String
+  content  String
+  imageURI String?
+  slug     String  @unique
+
+  type FooterType
+
+  createdAt DateTime @default(now())
+}
+
+model Auth {
+  id      String    @id @default(uuid())
+  oobCode String    @unique
+  applied Boolean?  @default(false)
+  mode    AuthModes
+  email   String
+
+  createdAt DateTime @default(now())
+}
+
+model Users {
+  id       String   @id @default(uuid())
+  name     String
+  email    String   @unique
+  number   String?  @unique
+  imageURI String?
+  tier     Int?     @default(0)
+  verify   Boolean? @default(false)
+  status   Boolean? @default(true)
+
+  type AccountType? @default(CUSTOMERS)
+
+  business    Business? @relation(name: "userBusiness", references: [id], fields: [business_id])
+  business_id String?   @unique
+  reviews     Reviews[] @relation(name: "userReview")
+
+  createdAt DateTime @default(now())
+
+  addresses Addresses[] @relation(name: "UsersAddresses")
+}
+
+model Business {
+  id      String @id @default(uuid())
+  name    String
+  email   String
+  phone   String
+  address String
+  country String
+  city    String
+  state   String
+  doc     String
+
+  sellerType   BusinessSellerType
+  businessType BusinesType
+
+  user Users? @relation(name: "userBusiness")
+
+  createdAt DateTime @default(now())
+}
+
+model Addresses {
+  id        String  @id @default(uuid())
+  address   String
+  city      String?
+  postcode  String?
+  label     String
+  firstName String?
+  lastName  String?
+  number    String?
+
+  user    Users  @relation(name: "UsersAddresses", references: [id], fields: [user_id])
+  user_id String
+
+  orders Orders[] @relation(name: "orderAddress")
+
+  createdAt DateTime @default(now())
+}
+
+model Products {
+  id       String @id @default(uuid())
+  name     String
+  slug     String @unique
+  sku      String
+  code     String @unique
+  imageURI String
+  quantity Int
+
+  purchase_price Float
+  selling_price  Float
+  discount_price Float
+  tier1_price    Float?
+  tier2_price    Float?
+  tier3_price    Float?
+  tier4_price    Float?
+
+  tags              String[]
+  galleryImage      String[]
+  short_description String?
+  long_description  String?
+  additional_info   String?
+
+  hot_deals     Boolean? @default(false)
+  featured      Boolean? @default(false)
+  new_arrival   Boolean? @default(false)
+  special_offer Boolean? @default(false)
+  special_deals Boolean? @default(false)
+  status        Boolean? @default(true)
+
+  main_category     Categories  @relation(name: "MainCategory", references: [id], fields: [main_category_id])
+  main_category_id  String
+  sub_category      Categories  @relation(name: "SubCategory", references: [id], fields: [sub_category_id])
+  sub_category_id   String
+  inner_category    Categories? @relation(name: "InnerCategory", references: [id], fields: [inner_category_id])
+  inner_category_id String?
+
+  variants     Variants[]      @relation(name: "variantProduct")
+  orderProduct ProductOrders[] @relation(name: "productsOrders")
+
+  brands   Brands? @relation(name: "Brands", references: [id], fields: [brand_id])
+  brand_id String?
+
+  filters Filters[] @relation(name: "productFilters")
+  reviews Reviews[] @relation(name: "productReview")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Variants {
+  id       String      @id @default(uuid())
+  name     String
+  type     VariantTpes
+  required Boolean?    @default(false)
+
+  variants Variant[] @relation(name: "productVariants")
+
+  product    Products? @relation(name: "variantProduct", references: [id], fields: [product_id])
+  product_id String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Variant {
+  id       String   @id @default(uuid())
+  name     String
+  price    Float?
+  imageURI String?
+  quantity Int?
+  required Boolean? @default(false)
+  sku      String?  @unique
+
+  variantType   Variants        @relation(name: "productVariants", references: [id], fields: [variantTypeId])
+  variantTypeId String
+  productOrder  ProductOrders[] @relation(name: "orderProductVariant")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Categories {
+  id       String   @id @default(uuid())
+  name     String
+  slug     String   @unique
+  imageURI String?
+  active   Boolean? @default(true)
+  icon     String?
+
+  type CategoriesTypes
+
+  parent   Categories?  @relation(name: "parentCategory", references: [id], fields: [parentId])
+  parentId String?
+  child    Categories[] @relation(name: "parentCategory")
+
+  MainProducts  Products[]   @relation(name: "MainCategory")
+  SubProducts   Products[]   @relation(name: "SubCategory")
+  InnerProducts Products[]   @relation(name: "InnerCategory")
+  filters       FilterType[] @relation(name: "filtersCategory")
+  brand         Brands[]     @relation(name: "brandCategories")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Brands {
+  id       String  @id @default(uuid())
+  name     String
+  slug     String  @unique
+  imageURI String?
+
+  products    Products[]  @relation(name: "Brands")
+  category    Categories? @relation(name: "brandCategories", fields: [category_id], references: [id])
+  category_id String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Orders {
+  id           String      @id @default(uuid())
+  traction_id  String      @unique
+  total_price  Float
+  subtotal     Float
+  order_id     Int?        @unique @default(autoincrement())
+  order_status OrderStatus @default(PROCESSING)
+
+  Address    Addresses @relation(name: "orderAddress", fields: [address_id], references: [id])
+  address_id String
+
+  orderProducts ProductOrders[] @relation(name: "orderProducts")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ProductOrders {
+  id             String @id @default(uuid())
+  productId      String
+  quantity       Int?   @default(1)
+  purchasedPrice Float
+
+  order    Orders @relation(name: "orderProducts", fields: [order_id], references: [id])
+  order_id String
+
+  product Products @relation(name: "productsOrders", fields: [productId], references: [id])
+
+  variant Variant[] @relation(name: "orderProductVariant")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model FilterType {
+  id   String @id @default(uuid())
+  name String
+  slug String
+
+  filters     Filters[]   @relation(name: "additionalFilters")
+  category    Categories? @relation(name: "filtersCategory", references: [id], fields: [category_id])
+  category_id String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+}
+
+model Filters {
+  id   String @id @default(uuid())
+  name String
+  slug String
+
+  filtersTypes FilterType? @relation(name: "additionalFilters", references: [id], fields: [filterTypeId])
+  filterTypeId String?
+
+  products Products[] @relation(name: "productFilters")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+}
+
+enum CategoriesTypes {
+  MAIN
+  SUB
+  INNER
+}
+
+enum VariantTpes {
+  COLORS
+  SIZES
+  LIQUIDS
+  BATTERIES
+  CHARGERS
+  CUSTOMS
+}
+
+enum OrderStatus {
+  PROCESSING
+  SHIPPED
+  COMPLETED
+  CANCELLED
+}
+
+enum AccountType {
+  CUSTOMERS
+  RETAILERS
+}
+
+enum BusinessSellerType {
+  SHOPOWNER
+  JOBBER
+  DISTRIBUTER
+}
+
+enum BusinesType {
+  VAPESHOP
+  SMOKESHOP
+  DISPENSARY
+  PACKAGING
+}
+
+enum ImageType {
+  MAIN
+  SECONDARY
+  THIRD
+  FOURTH
+  FIFTH
+}
+
+enum FooterType {
+  ABOUT
+  CUSTOMERCARE
+  OURINFORMATION
+}
+
+enum AuthModes {
+  verifyEmail
+  passwordReset
+}

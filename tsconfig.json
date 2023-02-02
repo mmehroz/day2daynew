@@ -1,0 +1,48 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": false,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    
+    "baseUrl": "./",
+    "paths": {
+      "@components": [
+        "components/index.ts"
+      ],
+      "@uiUtils": [
+        "components/uiUtils/index.ts"
+      ],
+      "@types": [
+        "utils/types/index.d.ts"
+      ],
+      "@queries": [
+        "utils/queries/index.ts"
+      ],
+      "@hooks": [
+        "hooks/index.ts"
+      ],
+      "@context": [
+        "context/index.ts"
+      ],
+      "@firebase": [
+        "utils/firebase/firebase.ts"
+      ],
+      "@handlers": [
+        "utils/handlers/index.ts"
+      ]
+    },
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules"]
+}

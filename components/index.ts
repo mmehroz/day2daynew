@@ -1,0 +1,18 @@
+export { default as Header } from "./header";
+export { default as Layout } from "./layout";
+export { default as Slider } from "./Home/Slider";
+export { default as SliderSecondary } from "./Home/SecondarySlider";
+export { default as BrowseCategory } from "./Home/BrowseCategory";
+export { default as FeaturedProducts } from "./Home/FeaturedProducts";
+export { default as FlashSale } from "./Home/FlashSale";
+export { default as NewArrivals } from "./Home/NewArrivals";
+export { default as Newsbar } from "./Newsbar";
+export { default as Footer } from "./Footer";
+export { default as CategoryComp } from "./Category";
+export { default as Product } from "./product";
+export { default as Login } from "./auth/login";
+export { default as Cart } from "./cart";
+export { default as Register } from "./auth/register";
+export { default as Checkout } from "./checkout";
+export { default as Account } from "./account";
+export * from "./verify";
